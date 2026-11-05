@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# --- Configuration ---
+REPO_DIR="$HOME/git/dotfiles/setup" # IMPORTANT: Change this to your dotfiles repository path
+BREWFILE_NAME="Brewfile"                # Name of your Brewfile
+# These casks need an interactive administrator password; update them manually.
+SUDO_CASKS=(karabiner-elements logi-options+ mactex xquartz)
+export HOMEBREW_BUNDLE_CASK_SKIP="${HOMEBREW_BUNDLE_CASK_SKIP:+$HOMEBREW_BUNDLE_CASK_SKIP }${SUDO_CASKS[*]}"
+# Prevent newly added casks or changed installers from invoking sudo unattended.
+export HOMEBREW_NO_SUDO=1
+
+# --- Main Script Logic ---
+
+echo "--- $(date) ---"
+
+# 1. Explicitly set PATH to include Homebrew's bin directory
+# On Apple Silicon Macs, Homebrew installs to /opt/homebrew
+# On Intel Macs, Homebrew installs to /usr/local
+# Adding both to PATH to ensure compatibility, just in case
+export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Ensure brew is available in the current environment
+if ! command -v brew &> /dev/null; then
+    echo "Error: Homebrew command not found. Ensure it's in your PATH after sourcing."
+    exit 1
+fi
+
+# Ensure git is available in the current environment
+if ! command -v git &> /dev/null; then
+    echo "Error: Git command not found. Ensure it's in your PATH after sourcing."
+    exit 1
+fi
+
+
+# 2. Change to the repository directory
+echo "Changing to repository directory: $REPO_DIR"
+cd "$REPO_DIR" || { echo "Error: Could not change to $REPO_DIR. Exiting."; exit 1; }
+
+# 3. Pull latest changes (optional, but good practice to avoid conflicts)
+echo "Pulling latest changes from remote..."
+git stash
+git pull
+
+# 4. Update Homebrew and upgrade installed packages
+brew update
+
+brew bundle --file="$BREWFILE_NAME"
+
+brew upgrade --formula
+
+casks_to_upgrade=()
+while IFS= read -r cask; do
+    skip=false
+    for sudo_cask in "${SUDO_CASKS[@]}"; do
+        if [[ "$cask" == "$sudo_cask" ]]; then
+            echo "Skipping $cask: requires an administrator password."
+            skip=true
+            break
+        fi
+    done
+    if [[ "$skip" == false && -n "$cask" ]]; then
+        casks_to_upgrade+=("$cask")
+    fi
+done < <(brew list --cask)
+
+if (( ${#casks_to_upgrade[@]} > 0 )); then
+    brew upgrade --cask --greedy "${casks_to_upgrade[@]}"
+fi
+mas upgrade
+pip3 list --outdated --format=json | jq -r '.[].name' | xargs -n1 pip3 install --upgrade
+uv tool upgrade --all
+
+# Clean downloaded Homebrew installers, including cached current versions.
+cleanup_status=0
+echo "Cleaning Homebrew caches..."
+if ! brew cleanup -s; then
+    echo "Error: Homebrew cleanup failed."
+    cleanup_status=1
+fi
+
+# Use Cargo's cache lock and usage tracking; retain dependencies used recently.
+# Explicit global cache cleanup currently requires the installed nightly toolchain.
+echo "Cleaning Cargo caches unused for 30 days..."
+if command -v rustup &> /dev/null; then
+    if ! rustup run nightly cargo -Z gc clean gc \
+        --max-src-age "30 days" \
+        --max-download-age "30 days" \
+        --max-git-co-age "30 days"; then
+        echo "Error: Cargo cleanup failed; ensure the nightly toolchain is installed."
+        cleanup_status=1
+    fi
+else
+    echo "Error: rustup not found; Cargo cleanup could not run."
+    cleanup_status=1
+fi
+
+git stash pop
+
+echo "--- Script finished (cleanup status: $cleanup_status) ---"
+exit "$cleanup_status"

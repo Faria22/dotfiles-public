@@ -1,0 +1,7 @@
+indent=4
+whitespace-intrinsics=false
+whitespace-multdiv
+whitespace-plusminus
+enable-decl
+enable-replacements
+c-relations

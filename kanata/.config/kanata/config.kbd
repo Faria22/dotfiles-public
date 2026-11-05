@@ -1,0 +1,103 @@
+(defcfg
+  process-unmapped-keys yes
+  concurrent-tap-hold yes
+  macos-dev-names-include (
+    "Apple Internal Keyboard / Trackpad"
+  )
+)
+
+(defsrc
+  f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12
+  tab q w e r t y u i o p
+  a s d f g h j k l ;
+  z x c v b n m , . /
+  caps spc
+  rmet lsft
+)
+(defvar
+  tap-time 150
+  fast-tap-time 100
+
+  hold-time 200
+  slow-hold-time 300
+  fast-hold-time 150
+)
+
+(defalias
+  a (tap-hold $tap-time $slow-hold-time a lctl)
+  s (tap-hold $tap-time $slow-hold-time s lalt)
+  d (tap-hold $tap-time $hold-time d lsft)
+  f (tap-hold $tap-time $hold-time f lmet)
+  j (tap-hold $tap-time $hold-time j rmet)
+  k (tap-hold $tap-time $hold-time k rsft)
+  l (tap-hold $tap-time $slow-hold-time l ralt)
+  ; (tap-hold $tap-time $slow-hold-time ; rctl)
+
+  r (tap-hold $tap-time $slow-hold-time r lalt)
+  s-colemak (tap-hold $tap-time $hold-time s lsft)
+  t (tap-hold $tap-time $hold-time t lmet)
+  n (tap-hold $tap-time $hold-time n rmet)
+  e (tap-hold $tap-time $hold-time e rsft)
+  i (tap-hold $tap-time $slow-hold-time i ralt)
+  o (tap-hold $tap-time $slow-hold-time o rctl)
+
+  num (layer-while-held num-layer)
+  nav (layer-while-held nav-layer)
+
+  caps (tap-hold $fast-tap-time $fast-hold-time esc @nav)
+
+  dnd C-S-A-M-f6
+  mission-control C-up
+
+  spc (tap-hold $tap-time $hold-time spc @num)
+
+  cwt (caps-word-toggle 2000)
+)
+
+(deflayer colemak-home-mods
+  brdn  brup  (layer-switch qwerty-home-mods) (layer-switch colemak) lrld  @dnd  prev  pp  next  mute  vold  volu
+  tab q w f p b j l u y S-;
+  @a @r @s-colemak @t g m @n @e @i @o
+  z x c d v k h , . /
+  @caps @spc @cwt @mission-control
+)
+
+(deflayer colemak
+  brdn  brup  (layer-switch qwerty) (layer-switch colemak-home-mods) lrld  @dnd  prev  pp  next  mute  vold  volu
+  tab q w f p b j l u y ;
+  a r s t g m n e i o
+  z x c d v k h , . /
+  caps spc _ _
+)
+
+(deflayer qwerty-home-mods
+  brdn  brup  (layer-switch colemak-home-mods) (layer-switch qwerty)  lrld  @dnd  prev  pp  next  mute  vold  volu
+  tab q w e r t y u i o p
+  @a @s @d @f g h @j @k @l @;
+  z x c v b n m , . /
+  @caps @spc @nav @mission-control
+)
+
+(deflayer qwerty
+  brdn  brup  (layer-switch colemak)    (layer-switch qwerty-home-mods)    lrld  @dnd  prev  pp  next  mute  vold  volu
+  tab q w e r t y u i o p
+  a s d f g h j k l ;
+  z x c v b n m , . /
+  caps spc _ _
+)
+
+(deflayer num-layer
+  _ _ _ _ _ _ _ _ _ _ _ _
+  S-` 1 2 3 4 5 6 7 8 9 0
+  lctl lalt lsft lmet ` S-` rmet rsft ralt @;
+  XX XX [ ] XX XX - = XX \
+  _ _ _ _
+)
+
+(deflayer nav-layer
+  _ _ _ _ _ _ _ _ _ _ _ _
+  XX XX XX XX XX XX XX XX XX XX XX
+  lctl lalt lsft lmet XX left down up right XX
+  XX XX caps XX XX XX home end XX XX
+  _ _ _ _
+)

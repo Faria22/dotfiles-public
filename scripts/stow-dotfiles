@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if ! command -v stow >/dev/null 2>&1; then
+    echo 'GNU Stow is required. Install it with: brew install stow' >&2
+    exit 1
+fi
+
+# Package names and Stow flags may be supplied explicitly. With no arguments,
+# apply the complete configuration, including the QMK keymap.
+if (( $# == 0 )); then
+    set -- aliasmgr clangd fortran ghostty git kanata \
+        nvim python qmk shell worktrunk zsh
+fi
+
+cd -- "$REPO_DIR"
+exec stow "$@"

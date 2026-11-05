@@ -1,0 +1,15 @@
+.DS_Store
+.config/kanata/nohup.out
+setup/.brew_bundle_cron.log
+scripts/nohup.out
+nvim/.config/nvim/lazy-lock.json
+
+# Local credentials and machine-specific identity
+python/.pypirc
+shell/.ssh/config
+git/.gitconfig
+
+# Local environment files
+.env
+.env.*
+!.env.example

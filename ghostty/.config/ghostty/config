@@ -1,0 +1,30 @@
+theme = my_gruvbox_material
+
+font-family = Menlo
+font-family = "Hack Nerd Font Mono"
+font-size = 15
+font-feature = -calt, -liga, -dlig
+font-thicken
+
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
+
+window-padding-x = 5
+window-padding-y = 0
+window-padding-balance = true
+window-padding-color = extend
+window-step-resize = false
+
+macos-titlebar-style = native
+
+keybind = alt+backspace=text:\x17
+keybind = alt+m=goto_split:left
+keybind = alt+i=goto_split:right
+keybind = alt+n=goto_split:down
+keybind = alt+e=goto_split:up
+keybind = global:alt+f=toggle_quick_terminal
+quick-terminal-position = center
+quick-terminal-size = 35%,35%
+
+mouse-scroll-multiplier = 2

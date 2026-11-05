@@ -1,0 +1,47 @@
+--help = { command = "--help 2>&1 | bat --language=help --style=plain", enabled = true, global = true, description = "help command with color", tags = ["bat"] }
+-h = { command = "-h 2>&1 | bat --language=help --style=plain", enabled = true, global = true, description = "help command with color", tags = ["bat"] }
+ad = { command = "aocctl", enabled = true, global = false, tags = ["aoc"] }
+adc = { command = "aocctl commit", enabled = true, global = false, tags = ["aoc"] }
+adr = { command = "aocctl run", enabled = true, global = false, tags = ["aoc"] }
+ads = { command = "aocctl submit", enabled = true, global = false, tags = ["aoc"] }
+adt = { command = "aocctl test", enabled = true, global = false, tags = ["aoc"] }
+am = "aliasmgr"
+c = "clear"
+g = { command = "git", enabled = true, global = false, tags = ["git"] }
+ga = { command = "git add", enabled = true, global = false, tags = ["git"] }
+gb = { command = "git branch", enabled = true, global = false, tags = ["git"] }
+gc = { command = "git commit", enabled = true, global = false, tags = ["git"] }
+gca = { command = "git commit --amend", enabled = true, global = false, tags = ["git"] }
+gck = { command = "git checkout", enabled = true, global = false, tags = ["git"] }
+gcm = { command = "git commit -m", enabled = true, global = false, tags = ["git"] }
+gd = { command = "git diff", enabled = true, global = false, tags = ["git"] }
+gf = { command = "git fetch", enabled = true, global = false, tags = ["git"] }
+gl = { command = "git pull", enabled = true, global = false, tags = ["git"] }
+glog = { command = "git log --oneline", enabled = true, global = false, tags = ["git"] }
+glogn = "git log --oneline -n 5"
+gm = { command = "git merge", enabled = true, global = false, tags = ["git"] }
+gp = { command = "git push", enabled = true, global = false, tags = ["git"] }
+gr = { command = "git restore", enabled = true, global = false, tags = ["git"] }
+grs = { command = "git restore --staged", enabled = true, global = false, tags = ["git"] }
+gs = { command = "git status", enabled = true, global = false, tags = ["git"] }
+gst = { command = "git stash", enabled = true, global = false, tags = ["git"] }
+gtc = { command = "$EDITOR ~/.config/ghostty/config", enabled = true, global = false, description = "Edit Ghostty configuration", tags = ["ghostty"] }
+gw = { command = "git worktree", enabled = true, global = false, tags = ["git"] }
+ll = { command = "eza -la --icons=auto --group-directories-first", enabled = true, global = false, tags = ["eza"] }
+ls = { command = "eza --icons=auto", enabled = true, global = false, tags = ["eza"] }
+nd = { command = "next-day", enabled = true, global = false, tags = ["aoc"] }
+pfzf = { command = "| fzf --ansi", enabled = true, global = true, description = "pipe fzf" }
+pip = { command = "pip3", enabled = true, global = false, tags = ["python"] }
+py = { command = "python3", enabled = true, global = false, tags = ["python"] }
+rd = { command = "$(git rev-parse --show-toplevel)", enabled = true, global = true, tags = ["git"] }
+topu = "top -U $(whoami)"
+wls = { command = "wt list", enabled = true, global = false, tags = ["worktrunk"] }
+wm = { command = "wt merge", enabled = true, global = false, tags = ["worktrunk"] }
+wrm = { command = "wt remove", enabled = true, global = false, tags = ["worktrunk"] }
+ws = { command = "wt switch", enabled = true, global = false, tags = ["worktrunk"] }
+wsc = { command = "wt switch -c", enabled = true, global = false, tags = ["worktrunk"] }
+wscc = { command = "wt switch -c -x codex", enabled = true, global = false, tags = ["worktrunk"] }
+wsm = { command = "wt switch ^", enabled = true, global = false, tags = ["worktrunk"] }
+wtp = "wt step prune"
+xnvim = { command = "| xargs nvim", enabled = true, global = true }
+z = "zellij"

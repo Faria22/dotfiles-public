@@ -1,0 +1,48 @@
+#!/bin/bash
+set -euo pipefail
+
+config_dir="${HOME}/.config/kanata"
+kanata_bin="${HOME}/.cargo/bin/kanata"
+output_file="$config_dir/.kanata.out"
+lock_dir="$config_dir/.startup-lock"
+
+# Authenticate in the foreground, before stopping the existing remapper.
+"$kanata_bin" --cfg "$config_dir/config.kbd" --check --no-wait
+sudo -v
+if ! mkdir "$lock_dir" 2>/dev/null; then
+    echo "Another Kanata startup is in progress: $lock_dir" >&2
+    exit 1
+fi
+trap 'rmdir "$lock_dir"' EXIT
+
+# Karabiner-Elements manages its own daemon; never launch duplicate daemons.
+if ! pgrep -f '^/Library/Application Support/org.pqrs/Karabiner-DriverKit-VirtualHIDDevice/Applications/Karabiner-VirtualHIDDevice-Daemon.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Daemon$' >/dev/null; then
+    echo "The Karabiner driver daemon is not running. Start Karabiner-Elements first." >&2
+    exit 1
+fi
+
+# Replace all existing Kanata processes with exactly one instance.
+sudo -n pkill -x kanata || [[ $? -eq 1 ]]
+for ((attempt = 0; attempt < 50; attempt++)); do
+    if ! pgrep -x kanata >/dev/null; then break; fi
+    sleep 0.1
+done
+if pgrep -x kanata >/dev/null; then
+    echo "Existing Kanata processes did not stop; refusing to start a duplicate." >&2
+    exit 1
+fi
+nohup sudo -n "$kanata_bin" --cfg "$config_dir/config.kbd" --no-wait >"$output_file" 2>&1 </dev/null &
+for ((attempt = 0; attempt < 10; attempt++)); do
+    sleep 1
+    if grep -Eq 'connect_failed|\[ERROR\]|panicked' "$output_file"; then
+        cat "$output_file" >&2
+        exit 1
+    fi
+    if grep -q 'Starting kanata proper' "$output_file" && pgrep -x kanata >/dev/null; then
+        echo "Kanata started. Log: $output_file"
+        exit 0
+    fi
+done
+echo "Kanata startup was not confirmed. Check $output_file" >&2
+tail -n 30 "$output_file" >&2
+exit 1
